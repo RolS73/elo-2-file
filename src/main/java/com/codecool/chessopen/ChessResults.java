@@ -8,9 +8,8 @@ import java.util.*;
 
 public class ChessResults {
 
-    public List<String> getCompetitorsNamesFromFile(String fileName){
+    public List<String> getCompetitorsNamesFromFile(String fileName) {
         HashMap<String, Integer> competitorScoresMap = new HashMap<>();
-        List<String> result = new ArrayList<>();
 
         try {
             InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
@@ -19,18 +18,34 @@ public class ChessResults {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] lineData = line.split(",");
-                int competitorScoreSum = Integer.parseInt(lineData[1]) + Integer.parseInt(lineData[2]) + Integer.parseInt(lineData[3]) +
-                        Integer.parseInt(lineData[4]) + Integer.parseInt(lineData[5]);
-                        competitorScoresMap.put(lineData[0], competitorScoreSum);
+                int competitorScoreSum = calculateScoreSum(lineData);
+                competitorScoresMap.put(lineData[0], competitorScoreSum);
             }
         } catch (IOException ex) {
             System.out.println("File not found!");
         }
 
-        competitorScoresMap.entrySet()
+        return generateOrderedListFromHashMap(competitorScoresMap);
+    }
+
+    public static int calculateScoreSum(String[] dataReadFromFile) {
+        int competitorScoreSum = 0;
+
+        for (int i = 1; i < dataReadFromFile.length; i++) {
+            competitorScoreSum += Integer.parseInt(dataReadFromFile[i]);
+        }
+
+        return competitorScoreSum;
+    }
+
+    public static List<String> generateOrderedListFromHashMap(HashMap<String, Integer> inputHashMap) {
+        List<String> result = new ArrayList<>();
+
+        inputHashMap.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .forEachOrdered(stringIntegerEntry -> result.add(stringIntegerEntry.getKey()));
+
         return result;
     }
 
